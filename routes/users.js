@@ -8,7 +8,7 @@ const router = express.Router();
 // app.use(bodyParser.json()); 
 
 router.get("/", (req, resp) => {
-    connection.query("SELECT * FROM sub_category", (err, res) => {
+    connection.query("SELECT * FROM users", (err, res) => {
       if (err) {
         resp.status(404).json({ msg: err });
       } else {
@@ -36,13 +36,12 @@ router.get("/", (req, resp) => {
 
   router.post("/", (req, resp) => {
     let body = req.body;
-    if(!body.sub_cate_name || !body.sub_cate_desc || !body.sub_is_enable || !body.sub_created_on || !body.sub_created_by){
+    if(!body.name || !body.password || !body.phone){
       return resp.status(400).json({ msg: 'Mandatory field is missing' });
     }
     connection.query(
-      `INSERT INTO sub_category(sub_cate_name, sub_cate_desc, sub_is_enable, sub_created_on, 
-      sub_created_by) VALUES ('${body.sub_cate_name}','${body.sub_cate_desc}','${body.sub_is_enable}',
-      '${body.sub_created_on}','${body.sub_created_by}')`,[body.sub_cate_name, body.sub_cate_desc, body.sub_is_enable, body.sub_created_on, body.sub_created_by],
+      `INSERT INTO users(name,password,phone) VALUES ('${body.name}','${body.password}',
+      '${body.phone}')`,[body.name, body.password, body.phone],
       (err, result) => {
         if (err) {
           return resp.status(400).json({ msg: `Error in SQL:- ${err}` });

@@ -4,18 +4,18 @@ let bodyParser = require("body-parser");
 const router = express.Router();
 
 
-let app = express();
-app.use(bodyParser.json()); //Middleware - to convert incoming data into JSON
+// let app = express();
+// app.use(bodyParser.json()); //Middleware - to convert incoming data into JSON
 
 // APIS or EndPoints
-app.get("/", (req, resp) => {
-  resp.send("<h1>Hello World!</h1>");
-});
+// router.get("/", (req, resp) => {
+//   resp.send("<h1>Hello World!</h1>");
+// });
 
 //Fetch all categories
 
-app.get("/api/category", (req, resp) => {
-  connection.query("SELECT * FROM master", (err, res) => {
+router.get("/", (req, resp) => {
+  connection.query("SELECT * FROM category", (err, res) => {
     if (err) {
       resp.status(404).json({ msg: err });
     } else {
@@ -26,11 +26,11 @@ app.get("/api/category", (req, resp) => {
 
 
 //Fetch any individual category
-app.get("/api/category/:id", (req, resp) => {
+router.get("/:id", (req, resp) => {
   let catId = req.params.id;
   console.log(catId);
   connection.query(
-    `SELECT * FROM master WHERE id = ${catId}`,
+    `SELECT * FROM category WHERE id = ${catId}`,
     (err, res) => {
       if (err) {
         resp.status(404).json({ msg: err });
@@ -42,13 +42,13 @@ app.get("/api/category/:id", (req, resp) => {
 });
 
 //Insert category
-app.post("/api/category", (req, resp) => {
+router.post("/", (req, resp) => {
   let body = req.body;
   if(!body.cate_name || !body.cate_desc || !body.is_enable || !body.created_on || !body.created_by){
     return resp.status(400).json({ msg: 'Mandatory field is missing' });
   }
   connection.query(
-    `INSERT INTO master(cate_name, cate_desc, is_enable, created_on, 
+    `INSERT INTO category(cate_name, cate_desc, is_enable, created_on, 
     created_by) VALUES ('${body.cate_name}','${body.cate_desc}','${body.is_enable}',
     '${body.created_on}','${body.created_by}')`,[body.cate_name, body.cate_desc, body.is_enable, body.created_on, body.created_by],
     (err, result) => {
@@ -61,9 +61,9 @@ app.post("/api/category", (req, resp) => {
   );
 });
 //Delete category
-app.delete("/api/category/:id", (req, resp) => {
+router.delete("/:id", (req, resp) => {
     let id = req.params.id;
-    connection.query(`DELETE FROM master WHERE id = ${id}`,(error,result)=>{
+    connection.query(`DELETE FROM category WHERE id = ${id}`,(error,result)=>{
         if(error){
             return resp.status(400).json({"msg":error});
         }else{
@@ -73,13 +73,13 @@ app.delete("/api/category/:id", (req, resp) => {
 });
 
 //Modify some propeties of any category
-app.patch("/api/category", (req, resp) => {
+router.patch("/", (req, resp) => {
     let body = req.body;
     let id = body.id;
     if(!body.cate_name){
         return resp.status("404").json("msg","Mandatory field is missing!");
     }
-    connection.query(`UPDATE master SET cate_name='${body.cate_name}', cate_desc='${body.cate_desc}' WHERE id = ${id}`,(error,result)=>{
+    connection.query(`UPDATE category SET cate_name='${body.cate_name}', cate_desc='${body.cate_desc}' WHERE id = ${id}`,(error,result)=>{
         if(error){
             return resp.status(400).json({"msg":error})
         }else{
@@ -88,13 +88,13 @@ app.patch("/api/category", (req, resp) => {
     })
 });
 //Modify a category
-app.put("/api/category", (req, resp) => {
+router.put("/", (req, resp) => {
     let body = req.body;
     let id = body.id;
     if(!body.cate_name){
         return resp.status("404").json("msg","Mandatory field is missing!");
     }
-    connection.query(`UPDATE master SET 
+    connection.query(`UPDATE category SET 
         cate_name='${body.cate_name}', 
         cate_desc='${body.cate_desc}',
         is_enable = '${body.is_enable}',
@@ -109,6 +109,4 @@ app.put("/api/category", (req, resp) => {
     })
 });
 
-app.listen(5000, () => {
-  console.log("App is running on port 5000");
-});
+module.exports = router;
